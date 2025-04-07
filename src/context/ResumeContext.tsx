@@ -1,78 +1,69 @@
 
-import { createContext, useContext, useState, ReactNode } from 'react';
-import { Resume, Experience, Education, Skill, SkillCategory } from '../types/resume';
+import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { Resume, Experience, Education, SkillCategory, Skill, TemplateStyles } from '@/types/resume';
 
+// Default empty resume data
+const defaultResume: Resume = {
+  personalInfo: {
+    fullName: '',
+    title: '',
+    email: '',
+    phone: '',
+    location: '',
+    website: '',
+    linkedin: '',
+    summary: '',
+  },
+  experiences: [],
+  education: [],
+  skillCategories: [],
+  template: 'classic',
+  templateStyles: {
+    headerClass: 'bg-maroon-700',
+    accentClass: 'text-maroon-800 border-maroon-200',
+    skillClass: 'bg-maroon-600'
+  },
+  enhancementScore: null,
+};
+
+// Context interface
 interface ResumeContextType {
   resume: Resume;
   updatePersonalInfo: (info: Partial<Resume['personalInfo']>) => void;
-  addExperience: () => void;
-  updateExperience: (id: string, experience: Partial<Experience>) => void;
+  addExperience: (exp: Omit<Experience, 'id'>) => void;
+  updateExperience: (id: string, exp: Partial<Omit<Experience, 'id'>>) => void;
   removeExperience: (id: string) => void;
-  addEducation: () => void;
-  updateEducation: (id: string, education: Partial<Education>) => void;
+  addEducation: (edu: Omit<Education, 'id'>) => void;
+  updateEducation: (id: string, edu: Partial<Omit<Education, 'id'>>) => void;
   removeEducation: (id: string) => void;
-  addSkillCategory: () => void;
+  addSkillCategory: (category: string) => void;
   updateSkillCategory: (id: string, name: string) => void;
   removeSkillCategory: (id: string) => void;
-  addSkill: (categoryId: string) => void;
-  updateSkill: (categoryId: string, skillId: string, skill: Partial<Skill>) => void;
+  addSkill: (categoryId: string, skill: Omit<Skill, 'id'>) => void;
+  updateSkill: (categoryId: string, skillId: string, skill: Partial<Omit<Skill, 'id'>>) => void;
   removeSkill: (categoryId: string, skillId: string) => void;
   enhanceResume: () => void;
+  updateResumeTemplate: (template: string, styles: TemplateStyles) => void;
 }
 
-const initialResume: Resume = {
-  personalInfo: {
-    fullName: 'Your Name',
-    email: 'email@example.com',
-    phone: '(123) 456-7890',
-    location: 'City, State',
-    title: 'Professional Title',
-    summary: 'Professional summary highlighting your experience and expertise.',
-    linkedin: '',
-    website: '',
-  },
-  experiences: [
-    {
-      id: uuidv4(),
-      company: 'Company Name',
-      position: 'Job Title',
-      startDate: '2020-01',
-      endDate: '',
-      current: true,
-      description: 'Description of your responsibilities and achievements.',
-      achievements: ['Achievement 1', 'Achievement 2'],
-    },
-  ],
-  education: [
-    {
-      id: uuidv4(),
-      institution: 'University Name',
-      degree: 'Degree',
-      field: 'Field of Study',
-      startDate: '2016-09',
-      endDate: '2020-05',
-      current: false,
-      description: '',
-    },
-  ],
-  skillCategories: [
-    {
-      id: uuidv4(),
-      name: 'Technical Skills',
-      skills: [
-        { id: uuidv4(), name: 'Skill 1', level: 4 },
-        { id: uuidv4(), name: 'Skill 2', level: 3 },
-      ],
-    },
-  ],
-};
-
+// Create context with default value
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
-export const ResumeProvider = ({ children }: { children: ReactNode }) => {
-  const [resume, setResume] = useState<Resume>(initialResume);
+// Resume provider component
+export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [resume, setResume] = useState<Resume>(() => {
+    // Try to load from localStorage if available
+    const savedResume = localStorage.getItem('resume');
+    return savedResume ? JSON.parse(savedResume) : defaultResume;
+  });
 
+  // Save to localStorage whenever resume changes
+  React.useEffect(() => {
+    localStorage.setItem('resume', JSON.stringify(resume));
+  }, [resume]);
+
+  // Update personal info
   const updatePersonalInfo = (info: Partial<Resume['personalInfo']>) => {
     setResume((prev) => ({
       ...prev,
@@ -80,29 +71,20 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const addExperience = () => {
-    const newExperience: Experience = {
-      id: uuidv4(),
-      company: 'New Company',
-      position: 'Position',
-      startDate: '',
-      endDate: '',
-      current: false,
-      description: '',
-      achievements: [''],
-    };
-
+  // Experience methods
+  const addExperience = (exp: Omit<Experience, 'id'>) => {
+    const newExp: Experience = { ...exp, id: uuidv4() };
     setResume((prev) => ({
       ...prev,
-      experiences: [...prev.experiences, newExperience],
+      experiences: [...prev.experiences, newExp],
     }));
   };
 
-  const updateExperience = (id: string, experience: Partial<Experience>) => {
+  const updateExperience = (id: string, exp: Partial<Omit<Experience, 'id'>>) => {
     setResume((prev) => ({
       ...prev,
-      experiences: prev.experiences.map((exp) =>
-        exp.id === id ? { ...exp, ...experience } : exp
+      experiences: prev.experiences.map((item) =>
+        item.id === id ? { ...item, ...exp } : item
       ),
     }));
   };
@@ -110,33 +92,24 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const removeExperience = (id: string) => {
     setResume((prev) => ({
       ...prev,
-      experiences: prev.experiences.filter((exp) => exp.id !== id),
+      experiences: prev.experiences.filter((item) => item.id !== id),
     }));
   };
 
-  const addEducation = () => {
-    const newEducation: Education = {
-      id: uuidv4(),
-      institution: 'New Institution',
-      degree: 'Degree',
-      field: 'Field of Study',
-      startDate: '',
-      endDate: '',
-      current: false,
-      description: '',
-    };
-
+  // Education methods
+  const addEducation = (edu: Omit<Education, 'id'>) => {
+    const newEdu: Education = { ...edu, id: uuidv4() };
     setResume((prev) => ({
       ...prev,
-      education: [...prev.education, newEducation],
+      education: [...prev.education, newEdu],
     }));
   };
 
-  const updateEducation = (id: string, education: Partial<Education>) => {
+  const updateEducation = (id: string, edu: Partial<Omit<Education, 'id'>>) => {
     setResume((prev) => ({
       ...prev,
-      education: prev.education.map((edu) =>
-        edu.id === id ? { ...edu, ...education } : edu
+      education: prev.education.map((item) =>
+        item.id === id ? { ...item, ...edu } : item
       ),
     }));
   };
@@ -144,17 +117,17 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const removeEducation = (id: string) => {
     setResume((prev) => ({
       ...prev,
-      education: prev.education.filter((edu) => edu.id !== id),
+      education: prev.education.filter((item) => item.id !== id),
     }));
   };
 
-  const addSkillCategory = () => {
+  // Skills methods
+  const addSkillCategory = (name: string) => {
     const newCategory: SkillCategory = {
       id: uuidv4(),
-      name: 'New Category',
+      name,
       skills: [],
     };
-
     setResume((prev) => ({
       ...prev,
       skillCategories: [...prev.skillCategories, newCategory],
@@ -164,8 +137,8 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const updateSkillCategory = (id: string, name: string) => {
     setResume((prev) => ({
       ...prev,
-      skillCategories: prev.skillCategories.map((cat) =>
-        cat.id === id ? { ...cat, name } : cat
+      skillCategories: prev.skillCategories.map((category) =>
+        category.id === id ? { ...category, name } : category
       ),
     }));
   };
@@ -173,39 +146,38 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const removeSkillCategory = (id: string) => {
     setResume((prev) => ({
       ...prev,
-      skillCategories: prev.skillCategories.filter((cat) => cat.id !== id),
+      skillCategories: prev.skillCategories.filter((category) => category.id !== id),
     }));
   };
 
-  const addSkill = (categoryId: string) => {
-    const newSkill: Skill = {
-      id: uuidv4(),
-      name: 'New Skill',
-      level: 3,
-    };
-
+  const addSkill = (categoryId: string, skill: Omit<Skill, 'id'>) => {
+    const newSkill: Skill = { ...skill, id: uuidv4() };
     setResume((prev) => ({
       ...prev,
-      skillCategories: prev.skillCategories.map((cat) =>
-        cat.id === categoryId
-          ? { ...cat, skills: [...cat.skills, newSkill] }
-          : cat
+      skillCategories: prev.skillCategories.map((category) =>
+        category.id === categoryId
+          ? { ...category, skills: [...category.skills, newSkill] }
+          : category
       ),
     }));
   };
 
-  const updateSkill = (categoryId: string, skillId: string, skill: Partial<Skill>) => {
+  const updateSkill = (
+    categoryId: string,
+    skillId: string,
+    skill: Partial<Omit<Skill, 'id'>>
+  ) => {
     setResume((prev) => ({
       ...prev,
-      skillCategories: prev.skillCategories.map((cat) =>
-        cat.id === categoryId
+      skillCategories: prev.skillCategories.map((category) =>
+        category.id === categoryId
           ? {
-              ...cat,
-              skills: cat.skills.map((s) =>
+              ...category,
+              skills: category.skills.map((s) =>
                 s.id === skillId ? { ...s, ...skill } : s
               ),
             }
-          : cat
+          : category
       ),
     }));
   };
@@ -213,77 +185,118 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const removeSkill = (categoryId: string, skillId: string) => {
     setResume((prev) => ({
       ...prev,
-      skillCategories: prev.skillCategories.map((cat) =>
-        cat.id === categoryId
+      skillCategories: prev.skillCategories.map((category) =>
+        category.id === categoryId
           ? {
-              ...cat,
-              skills: cat.skills.filter((s) => s.id !== skillId),
+              ...category,
+              skills: category.skills.filter((s) => s.id !== skillId),
             }
-          : cat
+          : category
       ),
     }));
   };
 
-  // Simulate AI enhancement
-  const enhanceResume = () => {
-    // In a real app, this would call the Python backend
-    // For now, we'll just simulate with some improvements
-    const enhancedResume = { ...resume };
-    
-    // Enhance summary
-    if (enhancedResume.personalInfo.summary) {
-      enhancedResume.personalInfo.summary = enhancedResume.personalInfo.summary
-        .replace(/experienced/i, 'seasoned')
-        .replace(/good/i, 'excellent')
-        .replace(/worked on/i, 'successfully delivered')
-        .replace(/help/i, 'drive impact and contribute to');
-    }
-    
-    // Add random score
-    enhancedResume.enhancementScore = Math.floor(Math.random() * 30) + 70;
-    
-    // Enhance experience descriptions
-    enhancedResume.experiences = enhancedResume.experiences.map(exp => {
-      const description = exp.description
-        .replace(/led/i, 'spearheaded')
-        .replace(/created/i, 'designed and implemented')
-        .replace(/improved/i, 'optimized')
-        .replace(/managed/i, 'orchestrated');
-      
-      return {
-        ...exp,
-        description
-      };
-    });
-    
-    setResume(enhancedResume);
+  // Update resume template and its styles
+  const updateResumeTemplate = (template: string, styles: TemplateStyles) => {
+    setResume((prev) => ({
+      ...prev,
+      template,
+      templateStyles: styles,
+    }));
   };
 
-  return (
-    <ResumeContext.Provider
-      value={{
-        resume,
-        updatePersonalInfo,
-        addExperience,
-        updateExperience,
-        removeExperience,
-        addEducation,
-        updateEducation,
-        removeEducation,
-        addSkillCategory,
-        updateSkillCategory,
-        removeSkillCategory,
-        addSkill,
-        updateSkill,
-        removeSkill,
-        enhanceResume,
-      }}
-    >
-      {children}
-    </ResumeContext.Provider>
-  );
+  // Enhance resume with AI (simulated)
+  const enhanceResume = () => {
+    setResume((prev) => {
+      // Make a deep copy to avoid modifying state directly
+      const newResume = JSON.parse(JSON.stringify(prev));
+      
+      // Enhance experiences
+      newResume.experiences = newResume.experiences.map((exp: Experience) => {
+        // Improve description if exists
+        if (exp.description) {
+          exp.description = improveText(exp.description);
+        }
+        
+        // Improve achievements
+        exp.achievements = exp.achievements.map((achievement: string) => 
+          achievement ? improveAchievement(achievement) : achievement
+        );
+        
+        return exp;
+      });
+      
+      // Enhance summary if exists
+      if (newResume.personalInfo.summary) {
+        newResume.personalInfo.summary = improveText(newResume.personalInfo.summary);
+      }
+      
+      // Set a random enhancement score between 80-95
+      newResume.enhancementScore = Math.floor(Math.random() * 16) + 80;
+      
+      return newResume;
+    });
+  };
+  
+  // Helper function to improve text (simple simulation)
+  const improveText = (text: string): string => {
+    // Example of simple improvements
+    const improvements: Record<string, string> = {
+      'responsible for': 'led',
+      'worked on': 'developed',
+      'helped': 'contributed to',
+      'did': 'executed',
+      'made': 'created',
+      'good': 'excellent',
+      'improved': 'optimized',
+      'managed': 'orchestrated',
+    };
+    
+    let improvedText = text;
+    Object.entries(improvements).forEach(([original, improved]) => {
+      const regex = new RegExp(`\\b${original}\\b`, 'gi');
+      improvedText = improvedText.replace(regex, improved);
+    });
+    
+    return improvedText;
+  };
+  
+  // Helper function to improve achievements
+  const improveAchievement = (achievement: string): string => {
+    // Add quantifiable results or action verbs if not present
+    if (!achievement.match(/^[A-Z][a-z]+ed|^[A-Z][a-z]+d/)) {
+      const actionVerbs = ['Implemented', 'Developed', 'Launched', 'Spearheaded', 'Achieved', 'Increased', 'Reduced'];
+      const randomVerb = actionVerbs[Math.floor(Math.random() * actionVerbs.length)];
+      achievement = `${randomVerb} ${achievement.charAt(0).toLowerCase() + achievement.slice(1)}`;
+    }
+    
+    return achievement;
+  };
+
+  // Provide context value
+  const value: ResumeContextType = {
+    resume,
+    updatePersonalInfo,
+    addExperience,
+    updateExperience,
+    removeExperience,
+    addEducation,
+    updateEducation,
+    removeEducation,
+    addSkillCategory,
+    updateSkillCategory,
+    removeSkillCategory,
+    addSkill,
+    updateSkill,
+    removeSkill,
+    enhanceResume,
+    updateResumeTemplate,
+  };
+
+  return <ResumeContext.Provider value={value}>{children}</ResumeContext.Provider>;
 };
 
+// Custom hook to use the resume context
 export const useResume = () => {
   const context = useContext(ResumeContext);
   if (context === undefined) {

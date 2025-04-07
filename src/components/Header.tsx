@@ -1,11 +1,13 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useResume } from '@/context/ResumeContext';
 import { useToast } from '@/components/ui/use-toast';
-import { FileText, Download, Sparkles } from 'lucide-react';
+import { FileText, Download, Sparkles, ArrowLeft } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import TemplateSelector from './TemplateSelector';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const { resume, enhanceResume } = useResume();
@@ -78,11 +80,14 @@ const Header = () => {
       const yOffset = (pdfHeight - finalHeight) / 2;
       
       pdf.addImage(imgData, 'JPEG', xOffset, yOffset, finalWidth, finalHeight);
-      pdf.save(`${resume.personalInfo.fullName || 'Resume'}.pdf`);
+      
+      // Use the person's name for the filename, or "Resume" if no name
+      const fileName = `${resume.personalInfo.fullName || 'Resume'}.pdf`;
+      pdf.save(fileName);
       
       toast({
         title: "Resume Exported",
-        description: "Your resume has been downloaded as PDF.",
+        description: `Your resume has been downloaded as ${fileName}.`,
         duration: 3000,
       });
     } catch (error) {
@@ -102,11 +107,23 @@ const Header = () => {
     <header className="maroon-gradient text-white py-5 px-4 md:px-6 shadow-md animate-fade-in">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center mb-4 md:mb-0">
-          <FileText className="h-8 w-8 mr-2" />
-          <h1 className="text-2xl font-bold">Simple Resume.AI</h1>
+          <Link to="/" className="flex items-center hover:opacity-90 transition-opacity">
+            <FileText className="h-8 w-8 mr-2" />
+            <h1 className="text-2xl font-bold">Simple Resume.AI</h1>
+          </Link>
         </div>
         
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div className="flex flex-wrap gap-3 justify-center items-center">
+          <Link to="/" className="text-white hover:text-gray-200 transition-colors mr-2">
+            <Button 
+              variant="ghost" 
+              className="text-white hover:text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </Link>
+          
           <TemplateSelector />
           
           <Button 

@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 
 const ResumePreview = () => {
   const { resume } = useResume();
-  const { personalInfo, experiences, education, skillCategories } = resume;
+  const { personalInfo, experiences, education, skillCategories, templateStyles } = resume;
   
   // Format date to display in more readable format
   const formatDate = (dateString: string) => {
@@ -30,6 +30,11 @@ const ResumePreview = () => {
     return `${start} - ${end}`;
   };
 
+  // Determine template styles to use (default to classic if none set)
+  const headerClass = templateStyles?.headerClass || 'bg-maroon-700';
+  const accentClass = templateStyles?.accentClass || 'text-maroon-800 border-maroon-200';
+  const skillClass = templateStyles?.skillClass || 'bg-maroon-600';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +42,7 @@ const ResumePreview = () => {
       transition={{ duration: 0.5 }}
     >
       <Card className="resume-preview-card shadow-lg w-full max-w-[800px] mx-auto bg-white overflow-hidden">
-        <div className="p-8 bg-maroon-700 text-white">
+        <div className={`p-8 ${headerClass} text-white`}>
           <h1 className="text-3xl font-bold mb-1">{personalInfo.fullName}</h1>
           <h2 className="text-xl opacity-90 mb-4">{personalInfo.title}</h2>
           
@@ -82,7 +87,7 @@ const ResumePreview = () => {
         <div className="p-8">
           {personalInfo.summary && (
             <div className="mb-6">
-              <h3 className="text-lg font-bold border-b border-maroon-200 pb-1 mb-3 text-maroon-800 flex items-center">
+              <h3 className={`text-lg font-bold border-b pb-1 mb-3 flex items-center ${accentClass}`}>
                 <FileText className="h-5 w-5 mr-2" />
                 Professional Summary
               </h3>
@@ -92,7 +97,7 @@ const ResumePreview = () => {
           
           {experiences.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-bold border-b border-maroon-200 pb-1 mb-3 text-maroon-800 flex items-center">
+              <h3 className={`text-lg font-bold border-b pb-1 mb-3 flex items-center ${accentClass}`}>
                 <Briefcase className="h-5 w-5 mr-2" />
                 Work Experience
               </h3>
@@ -108,7 +113,7 @@ const ResumePreview = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
                       <div>
                         <h4 className="font-bold text-gray-800">{exp.position}</h4>
-                        <div className="text-maroon-700">{exp.company}</div>
+                        <div className={accentClass.split(' ')[0]}>{exp.company}</div>
                       </div>
                       <div className="text-sm text-gray-600 flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
@@ -135,7 +140,7 @@ const ResumePreview = () => {
           
           {education.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-bold border-b border-maroon-200 pb-1 mb-3 text-maroon-800 flex items-center">
+              <h3 className={`text-lg font-bold border-b pb-1 mb-3 flex items-center ${accentClass}`}>
                 <BookOpen className="h-5 w-5 mr-2" />
                 Education
               </h3>
@@ -151,7 +156,7 @@ const ResumePreview = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
                       <div>
                         <h4 className="font-bold text-gray-800">{edu.degree} in {edu.field}</h4>
-                        <div className="text-maroon-700">{edu.institution}</div>
+                        <div className={accentClass.split(' ')[0]}>{edu.institution}</div>
                       </div>
                       <div className="text-sm text-gray-600 flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
@@ -170,7 +175,7 @@ const ResumePreview = () => {
           
           {skillCategories.length > 0 && (
             <div>
-              <h3 className="text-lg font-bold border-b border-maroon-200 pb-1 mb-3 text-maroon-800 flex items-center">
+              <h3 className={`text-lg font-bold border-b pb-1 mb-3 flex items-center ${accentClass}`}>
                 <Award className="h-5 w-5 mr-2" />
                 Skills
               </h3>
@@ -196,7 +201,7 @@ const ResumePreview = () => {
                                 key={i} 
                                 className={`h-2 w-2 rounded-full ${
                                   i < skill.level 
-                                    ? 'bg-maroon-600' 
+                                    ? skillClass
                                     : 'bg-gray-200'
                                 }`}
                               />
