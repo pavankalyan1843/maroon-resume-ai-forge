@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,6 +25,19 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				maroon: {
+					50: '#f9e6e6',
+					100: '#f0c0c0',
+					200: '#e49999',
+					300: '#d77272',
+					400: '#cb4b4b',
+					500: '#b73232',
+					600: '#962626',
+					700: '#751c1c',
+					800: '#591414',
+					900: '#3d0c0c',
+					950: '#280707',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -84,11 +98,25 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				'fade-out': {
+					'0%': { opacity: '1' },
+					'100%': { opacity: '0' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-out': 'fade-out 0.3s ease-out'
+			},
+			fontFamily: {
+				serif: ['Georgia', 'Cambria', 'serif'],
+				sans: ['Inter', 'Helvetica', 'Arial', 'sans-serif']
 			}
 		}
 	},
