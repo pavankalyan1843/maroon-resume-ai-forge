@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useResume } from '@/context/ResumeContext';
@@ -138,8 +137,7 @@ const Header = () => {
           <Button 
             onClick={handleExport} 
             disabled={exporting}
-            variant="outline" 
-            className="border-white text-white hover:bg-maroon-600 transition-transform hover:scale-105"
+            className="bg-transparent border border-white text-white hover:bg-white/10"
           >
             <Download className="h-4 w-4 mr-2" />
             {exporting ? 'Exporting...' : 'Export PDF'}
