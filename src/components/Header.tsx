@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useResume } from '@/context/ResumeContext';
@@ -40,7 +39,7 @@ const Header = () => {
     
     try {
       // Target the resume preview element
-      const element = document.querySelector('.resume-preview-card');
+      const element = document.querySelector('.resume-preview-card') as HTMLElement;
       if (!element) throw new Error("Resume preview not found");
       
       const canvas = await html2canvas(element, {
