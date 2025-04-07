@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Resume, Experience, Education, SkillCategory, Skill, TemplateStyles } from '@/types/resume';
@@ -27,20 +26,48 @@ const defaultResume: Resume = {
   enhancementScore: null,
 };
 
+// Create default empty objects for add functions
+const emptyExperience: Omit<Experience, 'id'> = {
+  company: '',
+  position: '',
+  location: '',
+  startDate: '',
+  endDate: '',
+  current: false,
+  description: '',
+  achievements: []
+};
+
+const emptyEducation: Omit<Education, 'id'> = {
+  institution: '',
+  degree: '',
+  field: '',
+  location: '',
+  startDate: '',
+  endDate: '',
+  current: false,
+  description: ''
+};
+
+const emptySkill: Omit<Skill, 'id'> = {
+  name: '',
+  level: 1
+};
+
 // Context interface
 interface ResumeContextType {
   resume: Resume;
   updatePersonalInfo: (info: Partial<Resume['personalInfo']>) => void;
-  addExperience: (exp: Omit<Experience, 'id'>) => void;
+  addExperience: (exp?: Omit<Experience, 'id'>) => void;
   updateExperience: (id: string, exp: Partial<Omit<Experience, 'id'>>) => void;
   removeExperience: (id: string) => void;
-  addEducation: (edu: Omit<Education, 'id'>) => void;
+  addEducation: (edu?: Omit<Education, 'id'>) => void;
   updateEducation: (id: string, edu: Partial<Omit<Education, 'id'>>) => void;
   removeEducation: (id: string) => void;
-  addSkillCategory: (category: string) => void;
+  addSkillCategory: (name?: string) => void;
   updateSkillCategory: (id: string, name: string) => void;
   removeSkillCategory: (id: string) => void;
-  addSkill: (categoryId: string, skill: Omit<Skill, 'id'>) => void;
+  addSkill: (categoryId: string, skill?: Omit<Skill, 'id'>) => void;
   updateSkill: (categoryId: string, skillId: string, skill: Partial<Omit<Skill, 'id'>>) => void;
   removeSkill: (categoryId: string, skillId: string) => void;
   enhanceResume: () => void;
@@ -72,8 +99,13 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Experience methods
-  const addExperience = (exp: Omit<Experience, 'id'>) => {
-    const newExp: Experience = { ...exp, id: uuidv4() };
+  const addExperience = (exp?: Omit<Experience, 'id'>) => {
+    const newExp: Experience = { 
+      ...emptyExperience, 
+      ...(exp || {}), 
+      id: uuidv4() 
+    };
+    
     setResume((prev) => ({
       ...prev,
       experiences: [...prev.experiences, newExp],
@@ -97,8 +129,13 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Education methods
-  const addEducation = (edu: Omit<Education, 'id'>) => {
-    const newEdu: Education = { ...edu, id: uuidv4() };
+  const addEducation = (edu?: Omit<Education, 'id'>) => {
+    const newEdu: Education = { 
+      ...emptyEducation, 
+      ...(edu || {}), 
+      id: uuidv4() 
+    };
+    
     setResume((prev) => ({
       ...prev,
       education: [...prev.education, newEdu],
@@ -122,10 +159,10 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Skills methods
-  const addSkillCategory = (name: string) => {
+  const addSkillCategory = (name?: string) => {
     const newCategory: SkillCategory = {
       id: uuidv4(),
-      name,
+      name: name || 'New Category',
       skills: [],
     };
     setResume((prev) => ({
@@ -150,8 +187,13 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }));
   };
 
-  const addSkill = (categoryId: string, skill: Omit<Skill, 'id'>) => {
-    const newSkill: Skill = { ...skill, id: uuidv4() };
+  const addSkill = (categoryId: string, skill?: Omit<Skill, 'id'>) => {
+    const newSkill: Skill = { 
+      ...emptySkill, 
+      ...(skill || {}), 
+      id: uuidv4() 
+    };
+    
     setResume((prev) => ({
       ...prev,
       skillCategories: prev.skillCategories.map((category) =>

@@ -19,6 +19,11 @@ const ExperienceForm = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  // Handle adding experience (Button onClick handler)
+  const handleAddExperience = () => {
+    addExperience();
+  };
+
   const handleAddAchievement = (experienceId: string) => {
     const experience = experiences.find(exp => exp.id === experienceId);
     if (!experience) return;
@@ -62,7 +67,7 @@ const ExperienceForm = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={addExperience}
+          onClick={handleAddExperience}
           className="text-maroon-700 border-maroon-700 hover:bg-maroon-50"
         >
           <Plus className="h-4 w-4 mr-1" /> Add Experience
@@ -76,7 +81,7 @@ const ExperienceForm = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={addExperience}
+              onClick={handleAddExperience}
               className="mt-3 text-maroon-700 border-maroon-700 hover:bg-maroon-50"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Experience

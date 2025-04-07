@@ -18,6 +18,11 @@ const EducationForm = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  // Handle adding education (Button onClick handler)
+  const handleAddEducation = () => {
+    addEducation();
+  };
+
   return (
     <Card className="resume-section animate-fade-in">
       <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -28,7 +33,7 @@ const EducationForm = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={addEducation}
+          onClick={handleAddEducation}
           className="text-maroon-700 border-maroon-700 hover:bg-maroon-50"
         >
           <Plus className="h-4 w-4 mr-1" /> Add Education
@@ -42,7 +47,7 @@ const EducationForm = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={addEducation}
+              onClick={handleAddEducation}
               className="mt-3 text-maroon-700 border-maroon-700 hover:bg-maroon-50"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Education

@@ -23,6 +23,16 @@ const SkillsForm = () => {
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
   
+  // Handle adding skill category
+  const handleAddSkillCategory = () => {
+    addSkillCategory();
+  };
+  
+  // Handle adding skill to a category
+  const handleAddSkill = (categoryId: string) => {
+    addSkill(categoryId);
+  };
+  
   const startEditCategory = (id: string, name: string) => {
     setEditingCategory(id);
     setEditingCategoryName(name);
@@ -51,7 +61,7 @@ const SkillsForm = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={addSkillCategory}
+          onClick={handleAddSkillCategory}
           className="text-maroon-700 border-maroon-700 hover:bg-maroon-50"
         >
           <Plus className="h-4 w-4 mr-1" /> Add Category
@@ -65,7 +75,7 @@ const SkillsForm = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={addSkillCategory}
+              onClick={handleAddSkillCategory}
               className="mt-3 text-maroon-700 border-maroon-700 hover:bg-maroon-50"
             >
               <Plus className="h-4 w-4 mr-1" /> Add Category
@@ -167,7 +177,7 @@ const SkillsForm = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => addSkill(category.id)}
+                  onClick={() => handleAddSkill(category.id)}
                   className="w-full mt-2 text-maroon-700 border-maroon-700 hover:bg-maroon-50"
                 >
                   <Plus className="h-4 w-4 mr-1" /> Add Skill
